@@ -1,13 +1,14 @@
 import psycopg2
-from sqlalchemy import create_engine,Column,Integer,String,Boolean,asc,desc
-from sqlalchemy.orm import DeclarativeBase,sessionmaker
-import random,time
-from datetime import  datetime as dt
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, asc, desc
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
+import random, time
+from datetime import datetime as dt
 from faker import Faker
 
-engine=create_engine('postgresql+psycopg2://postgres:1234@localhost/users')
-Session=sessionmaker(engine)
-fake=Faker('ru_RU')
+engine = create_engine('postgresql+psycopg2://postgres:1234@localhost/users')
+Session = sessionmaker(engine)
+fake = Faker('ru_RU')
+
 
 class Base(DeclarativeBase):
     pass
@@ -15,26 +16,26 @@ class Base(DeclarativeBase):
 
 class Users(Base):
     __tablename__ = 'users'
-    id=Column(Integer,primary_key=True)
-    name=Column(String,nullable=False)
-    age=Column(Integer,nullable=False)
-    studying=Column(Boolean,nullable=False)
-    money=Column(Integer,default=1111)
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    age = Column(Integer, nullable=False)
+    studying = Column(Boolean, nullable=False)
+    money = Column(Integer, default=1111)
 
     def user_info(self):
-        return (f'{self.id}. {self.name} - {self.age} years old, {"in studying" if self.studying else "not in studying"}'
-                f' {self.money}$')
-
+        return (
+            f'{self.id}. {self.name} - {self.age} years old, {"in studying" if self.studying else "not in studying"}'
+            f' {self.money}$')
 
 
 class Dogs(Base):
     __tablename__ = 'dogs'
-    id=Column(Integer,primary_key=True)
-    breed=Column(String,nullable=False)
-    name=Column(String,nullable=False)
-    owner=Column(Boolean,nullable=False)
-    age=Column(Integer,nullable=False)
-    color=Column(String,nullable=False)
+    id = Column(Integer, primary_key=True)
+    breed = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    owner = Column(Boolean, nullable=False)
+    age = Column(Integer, nullable=False)
+    color = Column(String, nullable=False)
 
 
 Base.metadata.create_all(engine)
@@ -62,24 +63,22 @@ Base.metadata.create_all(engine)
 #         print(user.user_info())
 
 with Session() as session:
-    user=session.get(Users,10000) # способ получения информации о пользователе через первичный ключ
+    user = session.get(Users, 10000)  # способ получения информации о пользователе через первичный ключ
     print(user.user_info())
 
-
 with Session() as session:
-    session.query(Users).filter(Users.id==98993).update({'age':89})
-    session.query(Users).filter(Users.id==99558).delete()
+    session.query(Users).filter(Users.id == 98993).update({'age': 89})
+    session.query(Users).filter(Users.id == 99558).delete()
     session.commit()
 
-
 with Session() as session:
-    some_users=session.query(Users).filter(Users.id<=99999, Users.name=='Александр').order_by(asc(Users.money))
-    all_users=session.query(Users).all()
+    some_users = session.query(Users).filter(Users.id <= 99999, Users.name == 'Александр').order_by(asc(Users.money))
+    all_users = session.query(Users).all()
     for user in some_users:
         print(user.user_info())
 
-    kolvo_users=some_users.count()
-    vse_users=len(all_users)
-    print(round(kolvo_users/vse_users*100,2),'%')
+    kolvo_users = some_users.count()
+    vse_users = len(all_users)
+    print(round(kolvo_users / vse_users * 100, 2), '%')
     print(kolvo_users)
     print(vse_users)
